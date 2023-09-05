@@ -1,6 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "dotenv/config";
+import "@nomicfoundation/hardhat-verify";
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 
@@ -17,6 +18,9 @@ const config: HardhatUserConfig = {
       url: `https://rpc.public.zkevm-test.net`,
       accounts: [PRIVATE_KEY || ""],
     },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
 };
 
