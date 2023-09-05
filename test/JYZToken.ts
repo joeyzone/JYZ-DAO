@@ -39,7 +39,7 @@ describe("JYZToken", function () {
     const permitData = {
       owner: owner.address,
       spender: addr1.address,
-      amount: ethers.parseEther("1"),
+      amount: ethers.parseEther("100"),
       nonce,
     };
     const signature = await owner.signTypedData(domain, types, permitData);
@@ -52,6 +52,6 @@ describe("JYZToken", function () {
     );
 
     const allowance = await token.allowance(owner.address, addr1.address);
-    expect(allowance).to.be.equal(ethers.parseEther("1"));
+    expect(allowance).to.be.equal(ethers.parseEther("100"));
   });
 });

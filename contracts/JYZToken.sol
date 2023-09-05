@@ -32,7 +32,7 @@ contract JYZToken is ERC20, EIP712 {
         bytes calldata sig
     ) external {
         bytes32 structHash = keccak256(
-            abi.encode(_PERMIT_TYPEHASH, owner, spender, amount, useNonce())
+            abi.encode(_PERMIT_TYPEHASH, _owner, spender, amount, useNonce())
         );
         bytes32 _hash = _hashTypedDataV4(structHash);
         address signer = ECDSA.recover(_hash, sig);
