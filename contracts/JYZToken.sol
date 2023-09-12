@@ -32,7 +32,13 @@ contract JYZToken is ERC20, EIP712 {
         bytes calldata sig
     ) external {
         bytes32 structHash = keccak256(
-            abi.encode(_PERMIT_TYPEHASH, _owner, spender, amount, useNonce())
+            abi.encode(
+                _PERMIT_TYPEHASH,
+                _owner,
+                spender,
+                amount,
+                useNonce(_owner)
+            )
         );
         bytes32 _hash = _hashTypedDataV4(structHash);
         address signer = ECDSA.recover(_hash, sig);
@@ -40,9 +46,9 @@ contract JYZToken is ERC20, EIP712 {
         _approve(_owner, spender, amount);
     }
 
-    function useNonce() internal returns (uint256 _nonce) {
-        _nonce = ownerNonce[msg.sender];
-        ownerNonce[msg.sender] += 1;
+    function useNonce(address _owner) internal returns (uint256 _nonce) {
+        _nonce = ownerNonce[_owner];
+        ownerNonce[_owner] += 1;
     }
 
     function domainSeparatorV4() public view returns (bytes32) {

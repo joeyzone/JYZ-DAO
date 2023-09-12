@@ -5,19 +5,21 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract JYZDao {
     IERC20 public token;
     struct Topic {
-        bytes32 topicHash;
+        bytes32 topicHash; // topic content hash
         int32 passPercent;
-        int256 currentVotesNum; // maybe negative
+        int256 currentVotesNum; // int, maybe negative
         bool isPass;
-        string desc;
+        string desc; // short intro or title
         uint32 endTime;
     }
-    int256 public immutable totalVotesNum;
+    int256 public immutable totalVotesNum; // token's totalSupply
     address public immutable owner;
     mapping(bytes32 => Topic) public topicMap;
-    event VoteResult(bytes32 topicHash, bool isPass, int256 currentVotesNum);
+    mapping(bytes => bool) public votedMap; // the key is sender + topicHash
 
+    event VoteResult(bytes32 topicHash, bool isPass, int256 currentVotesNum);
     error VoteOver(bytes32 topicHash, bool isPass, int256 currentVotesNum);
+
     modifier onlyOwner() {
         require(msg.sender == owner, "Invalid owner");
         _;
@@ -72,6 +74,10 @@ contract JYZDao {
 
     function _dealTopic(bytes32 topicHash, bool isFavor) private {
         require(topicMap[topicHash].topicHash != 0, "Topic not exist");
+        require(
+            votedMap[abi.encode(msg.sender, topicHash)] == false,
+            "User already Voted"
+        );
         int256 voteNum = int256(token.balanceOf(msg.sender));
         int256 currentVotesNum = topicMap[topicHash].currentVotesNum;
         if (isFavor) {
@@ -80,13 +86,14 @@ contract JYZDao {
             currentVotesNum -= voteNum;
         }
 
-        int256 currentPercent = (currentVotesNum * 100) / totalVotesNum;
+        int256 currentPercent = (currentVotesNum * 100) / totalVotesNum; // 90 means 90%, no point
         if (currentPercent < topicMap[topicHash].passPercent) {
             topicMap[topicHash].isPass = false;
         } else {
             topicMap[topicHash].isPass = true;
         }
         topicMap[topicHash].currentVotesNum = currentVotesNum;
+        votedMap[abi.encode(msg.sender, topicHash)] = true;
     }
 
     function favorTopic(bytes32 topicHash) external voteIntime(topicHash) {
