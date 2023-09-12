@@ -75,7 +75,7 @@ contract JYZDao {
     function _dealTopic(bytes32 topicHash, bool isFavor) private {
         require(topicMap[topicHash].topicHash != 0, "Topic not exist");
         require(
-            votedMap[abi.encode(msg.sender, topicHash)] == false,
+            votedMap[abi.encodePacked(msg.sender, topicHash)] == false,
             "User already Voted"
         );
         int256 voteNum = int256(token.balanceOf(msg.sender));
@@ -93,7 +93,7 @@ contract JYZDao {
             topicMap[topicHash].isPass = true;
         }
         topicMap[topicHash].currentVotesNum = currentVotesNum;
-        votedMap[abi.encode(msg.sender, topicHash)] = true;
+        votedMap[abi.encodePacked(msg.sender, topicHash)] = true;
     }
 
     function favorTopic(bytes32 topicHash) external voteIntime(topicHash) {
